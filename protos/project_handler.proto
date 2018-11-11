@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package project_creator;
+
+import "google/api/annotations.proto";
+
+service ProjectCreatorAPI {
+    rpc CreateProject (CreateProjectRequest) returns (CreateProjectResponse) {
+        option (google.api.http) = {
+            post: "/createproject"
+            body: "*"
+        };
+    }
+}
+
+message CreateProjectRequest {
+    string email = 1;
+    string title = 2;
+    string description = 3;
+    string deadline = 4;
+    bool private = 5;
+}
+
+message CreateProjectResponse {
+    bool success = 1;
+}
