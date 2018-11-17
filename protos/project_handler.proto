@@ -13,6 +13,26 @@ service ProjectCreatorAPI {
     }
 }
 
+message Project {
+    string title = 1;
+    repeated string Users = 2;
+    string description = 3;
+    string deadline = 4;
+    bool private = 5;
+    repeated string Announcements = 6;
+    int32 size = 7;
+    string project_leader = 8;
+    int32 progress_bar = 9;
+    bool done = 10;
+    repeated string Milestones = 11;
+}
+
+message UserProjects {
+    string email = 1;
+    map<string, Project> projects = 2;
+}
+
+
 message CreateProjectRequest {
     string email = 1;
     string title = 2;
@@ -23,4 +43,14 @@ message CreateProjectRequest {
 
 message CreateProjectResponse {
     bool success = 1;
+}
+
+message FetchProjectRequest {
+    string email = 1;
+    string title = 2;
+}
+
+message FetchProjectResponse {
+    bool success = 1;
+    Project project = 2;
 }
