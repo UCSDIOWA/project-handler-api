@@ -27,6 +27,8 @@ message Project {
     string calendar = 11;
     repeated string Milestones = 12;
     repeated string Tags = 13;
+    repeated string pendingUsers = 14;
+
 }
 
 message UserProjects {
@@ -61,4 +63,30 @@ message FetchProjectRequest {
 message FetchProjectResponse {
     bool success = 1;
     Project project = 2;
+}
+
+message EditProjectRequest {
+    string title = 1;
+    repeated string Users = 2;
+    string description = 3;
+    string deadline = 4;
+    bool private = 5;
+    int32 size = 7;
+    string project_leader = 8;
+    bool done = 10;
+    string calendar = 11;
+    repeated string Tags = 13;
+}
+
+message EditProjectResponse {
+    bool success = 1;
+}
+
+message JoinProjectRequest {
+    string title = 1;
+    string newEmail = 2;
+}
+
+message JoinProjectResponse {
+    bool success = 1;
 }

@@ -17,12 +17,16 @@ type mongo struct {
 	Operation *mgo.Collection
 }
 
+// Host mongo server. Updating scope of of m
+var (
+	m, err = mgo.Dial("mongodb://tea:cse110IOWA@ds159263.mlab.com:59263/tea")
+)
+
 // DB is a pointer to mongo struct
 var DB *mongo
 
 func main() {
-	// Host mongo server
-	m, err := mgo.Dial("mongodb://tea:cse110IOWA@ds159263.mlab.com:59263/tea")
+
 	if err != nil {
 		log.Fatalf("Could not connect to the MongoDB server: %v", err)
 	}
@@ -92,9 +96,9 @@ func (s *server) CreateProject(ctx context.Context, crProjReq *pb.CreateProjectR
 
 	//make sure it's not a duplicate project
 	newProj := &pb.Project{}
-	projErr := DB.Operation.Find(bson.M{"title": crProjReq.Title}).One(newProj)
+	projErr := DB.Operation.Find(bson.M{"Title": crProjReq.Title}).One(newProj)
 
-	if (projErr != nil || newProj != {&pb.Project{})} {
+	if (projErr != nil || newProj != &pb.Project{}) {
 		return &pb.CreateProjectResponse{Success: false}, projErr
 	}
 
@@ -110,12 +114,14 @@ func (s *server) CreateProject(ctx context.Context, crProjReq *pb.CreateProjectR
 		ProjectLeader: crProjReq.Email,
 		ProgressBar:   0,
 		Done:          false,
+		Calendar:      "",
 		Milestones:    []string{},
 		Tags:          crProjReq.Tags,
+		PendingUsers:  []string{},
 	}
 
 	//Insert to the Projects collection
-	projErr = DB.Operation.Update(bson.M{"title": crProjReq.Title}, newProj)
+	projErr = DB.Operation.Insert(newProj)
 
 	if projErr != nil {
 		return &pb.CreateProjectResponse{Success: false}, projErr
@@ -133,7 +139,7 @@ func (s *server) CreateProject(ctx context.Context, crProjReq *pb.CreateProjectR
 			return &pb.CreateProjectResponse{Success: false}, tagErr
 		}
 		//if tag doesn't exist, create it. Otherwise, update.
-		if tagProjs == {&pb.TagProjects{}) {
+		if (tagProjs == &pb.TagProjects{}) {
 			tagErr := DB.Operation.Insert(bson.M{"name": v, "Projects": []string{crProjReq.Title}})
 			if tagErr != nil {
 				return &pb.CreateProjectResponse{Success: false}, tagErr
@@ -153,6 +159,58 @@ func (s *server) CreateProject(ctx context.Context, crProjReq *pb.CreateProjectR
 
 }
 
+/* This function creates a project for a given user */
+func (s *server) EditProject(ctx context.Context, edProjReq *pb.EditProjectRequest) (*pb.EditProjectResponse, error) {
+
+	/* Update the Projects collection */
+	DB = &mongo{m.DB("tea").C("projects")} //change collection to projects
+
+	//Insert to the Projects collection
+	err := DB.Operation.Update(bson.M{"Title": edProjReq.Title}, edProjReq)
+
+	if err != nil {
+		return &pb.EditProjectResponse{Success: false}, err
+	}
+
+	//if we made it here, we successfully updated all 3 collections, so return
+	return &pb.EditProjectResponse{Success: true}, nil
+
+}
+
+/* This function creates a project for a given user */
+func (s *server) JoinProject(ctx context.Context, jProjReq *pb.JoinProjectRequest) (*pb.JoinProjectResponse, error) {
+
+	/* Update the Projects collection */
+	DB = &mongo{m.DB("tea").C("projects")} //change collection to projects
+
+	//Check current users and pending users
+	currProj := &pb.Project{}
+	err := DB.Operation.Find(bson.M{"Title": jProjReq.Title}).One(currProj)
+	if err != nil {
+		return &pb.JoinProjectResponse{Success: false}, err
+	}
+	//make sure the user is not already in the group
+	for _, v := range currProj.Users {
+		if v == jProjReq.NewEmail {
+			return &pb.JoinProjectResponse{Success: false}, err
+		}
+	}
+	//make sure the user is not already pending
+	for _, v := range currProj.PendingUsers {
+		if v == jProjReq.NewEmail {
+			return &pb.JoinProjectResponse{Success: false}, err
+		}
+	}
+
+	//add the new email to the pending list
+	currProj.PendingUsers = append(currProj.PendingUsers, jProjReq.NewEmail)
+	err = DB.Operation.Update(bson.M{"Title": jProjReq.Title}, bson.M{"PendingUsers": currProj.PendingUsers})
+
+	//if we made it here, we successfully added the user to pending users list
+	return &pb.JoinProjectResponse{Success: true}, nil
+
+}
+
 /* This function fetches a project which belongs to a certain user */
 func (s *server) FetchProject(ctx context.Context, fProjReq *pb.FetchProjectRequest) (*pb.FetchProjectResponse, error) {
 
@@ -161,7 +219,7 @@ func (s *server) FetchProject(ctx context.Context, fProjReq *pb.FetchProjectRequ
 
 	fetched := &pb.Project{}
 
-	err := DB.Operation.Find(bson.M{"title": fProjReq.Title}).One(fetched)
+	err := DB.Operation.Find(bson.M{"Title": fProjReq.Title}).One(fetched)
 
 	if err != nil {
 		return &pb.FetchProjectResponse{Success: false, Project: &pb.Project{}}, err
