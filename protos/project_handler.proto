@@ -11,6 +11,30 @@ service ProjectCreatorAPI {
             body: "*"
         };
     }
+    rpc EditProject (EditProjectRequest) returns (EditProjectResponse) {
+        option (google.api.http) = {
+            post: "/editproject"
+            body: "*"
+        };
+    }
+    rpc FetchProject (FetchProjectRequest) returns (FetchProjectResponse) {
+        option (google.api.http) = {
+            post: "/fetchproject"
+            body: "*"
+        };
+    }
+    rpc JoinProject (JoinProjectRequest) returns (JoinProjectResponse) {
+        option (google.api.http) = {
+            post: "/joinproject"
+            body: "*"
+        };
+    }
+    rpc FindProjects (FindProjectsRequest) returns (FindProjectsResponse) {
+        option (google.api.http) = {
+            post: "/findprojects"
+            body: "*"
+        };
+    }
 }
 
 message Project {
@@ -89,4 +113,13 @@ message JoinProjectRequest {
 
 message JoinProjectResponse {
     bool success = 1;
+}
+
+message FindProjectsRequest {
+    repeated string Tags = 1;
+}
+
+message FindProjectsResponse {
+    bool success = 1;
+    repeated Project projects = 2;
 }

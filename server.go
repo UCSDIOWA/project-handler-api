@@ -130,24 +130,27 @@ func (s *server) CreateProject(ctx context.Context, crProjReq *pb.CreateProjectR
 	/* then, update the Tags collection */
 	DB = &mongo{m.DB("tea").C("tags")} //change collection to projects
 
+	//add project title to tags
+	crProjReq.Tags = append(crProjReq.Tags, crProjReq.Title)
+
 	//Insert the new title to each in tags collection
 	tagProjs := &pb.TagProjects{}
 	for _, v := range crProjReq.Tags {
 		//see if tag is already in collection
-		tagErr := DB.Operation.Find(bson.M{"name": v}).One(tagProjs)
+		tagErr := DB.Operation.Find(bson.M{"Name": v}).One(tagProjs)
 		if tagErr != nil {
 			return &pb.CreateProjectResponse{Success: false}, tagErr
 		}
 		//if tag doesn't exist, create it. Otherwise, update.
 		if (tagProjs == &pb.TagProjects{}) {
-			tagErr := DB.Operation.Insert(bson.M{"name": v, "Projects": []string{crProjReq.Title}})
+			tagErr := DB.Operation.Insert(bson.M{"Name": v, "Projects": []string{crProjReq.Title}})
 			if tagErr != nil {
 				return &pb.CreateProjectResponse{Success: false}, tagErr
 			}
 		} else {
 			//append new project title to tag's array of project titles
 			tagProjs.Projects = append(tagProjs.Projects, crProjReq.Title)
-			tagErr := DB.Operation.Update(bson.M{"name": v}, tagProjs)
+			tagErr := DB.Operation.Update(bson.M{"Name": v}, tagProjs)
 			if tagErr != nil {
 				return &pb.CreateProjectResponse{Success: false}, tagErr
 			}
@@ -165,14 +168,14 @@ func (s *server) EditProject(ctx context.Context, edProjReq *pb.EditProjectReque
 	/* Update the Projects collection */
 	DB = &mongo{m.DB("tea").C("projects")} //change collection to projects
 
-	//Insert to the Projects collection
+	//Update the correct project in the Projects collection
 	err := DB.Operation.Update(bson.M{"Title": edProjReq.Title}, edProjReq)
 
 	if err != nil {
 		return &pb.EditProjectResponse{Success: false}, err
 	}
 
-	//if we made it here, we successfully updated all 3 collections, so return
+	//if we made it here, we successfully edited all 3 collections, so return
 	return &pb.EditProjectResponse{Success: true}, nil
 
 }
@@ -208,6 +211,59 @@ func (s *server) JoinProject(ctx context.Context, jProjReq *pb.JoinProjectReques
 
 	//if we made it here, we successfully added the user to pending users list
 	return &pb.JoinProjectResponse{Success: true}, nil
+
+}
+
+/* This function fetches a project which belongs to a certain user */
+func (s *server) FindProjects(ctx context.Context, findProjReq *pb.FindProjectsRequest) (*pb.FindProjectsResponse, error) {
+
+	//used to access collections
+	DB = &mongo{m.DB("tea").C("tags")} //change collection to tags
+
+	rtnProjects := &pb.FindProjectsResponse{}
+
+	//map of projects and their counts
+	projs := make(map[string]bool)
+
+	//go through each Tag that the user searched by
+	for _, currTag := range findProjReq.Tags {
+		//get the projects pertaining to this tag
+		currProjs := &pb.TagProjects{}
+		err := DB.Operation.Find(bson.M{"Name": currTag}).One(currProjs)
+		if err != nil {
+			//return false and empty array
+			rtnProjects = &pb.FindProjectsResponse{}
+			rtnProjects.Success = false
+			return rtnProjects, err
+		}
+		//go through each project and add each unique one to our return Response
+		for _, projTitle := range currProjs.Projects {
+			//check if we've already found this project
+			exist := projs[projTitle]
+			if exist {
+				continue
+			}
+			projs[projTitle] = true
+			//get project information from projects collection
+			DB = &mongo{m.DB("tea").C("projects")}
+			currProj := &pb.Project{}
+			err := DB.Operation.Find(bson.M{"Title": projTitle}).One(currProj)
+			if err != nil {
+				//return false and empty array
+				rtnProjects = &pb.FindProjectsResponse{}
+				rtnProjects.Success = false
+				return rtnProjects, err
+			}
+			//add this project information to our return response
+			rtnProjects.Projects = append(rtnProjects.Projects, currProj)
+		}
+		//go back to tags collection
+		DB = &mongo{m.DB("tea").C("tags")} //change collection to tags
+
+	}
+
+	//otherwise, go ahead and return the project
+	return rtnProjects, nil
 
 }
 
