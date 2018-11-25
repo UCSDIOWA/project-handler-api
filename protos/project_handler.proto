@@ -38,20 +38,21 @@ service ProjectCreatorAPI {
 }
 
 message Project {
-    string title = 1;
-    repeated string Users = 2;
-    string description = 3;
-    string deadline = 4;
-    bool private = 5;
-    repeated string Announcements = 6;
-    int32 size = 7;
-    string project_leader = 8;
-    int32 progress_bar = 9;
-    bool done = 10;
-    string calendar = 11;
-    repeated string Milestones = 12;
-    repeated string Tags = 13;
-    repeated string pendingUsers = 14;
+    string ProjectID = 1;
+    string title = 2;
+    repeated string Users = 3;
+    string description = 4;
+    string deadline = 5;
+    bool private = 6;
+    repeated string Announcements = 7;
+    int32 size = 8;
+    string project_leader = 9;
+    int32 progress_bar = 10;
+    bool done = 11;
+    string calendar = 12;
+    repeated string Milestones = 13;
+    repeated string Tags = 14;
+    repeated string pendingUsers = 15;
 
 }
 
@@ -81,7 +82,7 @@ message CreateProjectResponse {
 
 message FetchProjectRequest {
     string email = 1;
-    string title = 2;
+    string ProjectID = 2;
 }
 
 message FetchProjectResponse {
@@ -90,16 +91,17 @@ message FetchProjectResponse {
 }
 
 message EditProjectRequest {
-    string title = 1;
-    repeated string Users = 2;
-    string description = 3;
-    string deadline = 4;
-    bool private = 5;
+    string ProjectID = 1;
+    string title = 2;
+    repeated string Users = 3;
+    string description = 4;
+    string deadline = 5;
+    bool private = 6;
     int32 size = 7;
     string project_leader = 8;
-    bool done = 10;
-    string calendar = 11;
-    repeated string Tags = 13;
+    bool done = 9;
+    string calendar = 10;
+    repeated string Tags = 11;
 }
 
 message EditProjectResponse {
@@ -107,7 +109,7 @@ message EditProjectResponse {
 }
 
 message JoinProjectRequest {
-    string title = 1;
+    string ProjectID = 1;
     string newEmail = 2;
 }
 

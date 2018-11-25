@@ -36,7 +36,7 @@ func main() {
 
 	//Using email to find users projects in database. Won't allow duplicate emails.
 	DB.Operation.EnsureIndex(mgo.Index{
-		Key:        []string{"email"},
+		Key:        []string{"ProjectID"},
 		Unique:     true,
 		DropDups:   true,
 		Background: true,
@@ -63,8 +63,9 @@ func (s *server) CreateProject(ctx context.Context, crProjReq *pb.CreateProjectR
 	/* first, update the project's field for the User collection */
 	DB = &mongo{m.DB("tea").C("users")} //change collection to projects
 
-	//Get user projects
+	//Get user projects. Also, we will be using this generated id as the index for this project
 	usrProjects := &pb.UserProjects{}
+	id := bson.NewObjectId()
 
 	//get all user's project titles
 	usrErr := DB.Operation.Find(bson.M{"email": crProjReq.Email}).One(usrProjects)
@@ -76,13 +77,13 @@ func (s *server) CreateProject(ctx context.Context, crProjReq *pb.CreateProjectR
 
 	//if a project was already found, then we can't create this project
 	for _, proj := range usrProjects.Projects {
-		if proj == crProjReq.Title {
+		if proj == string(id) {
 			return &pb.CreateProjectResponse{Success: false}, nil
 		}
 	}
 
 	//otherwise, go ahead and add the project
-	usrProjects.Projects = append(usrProjects.Projects, crProjReq.Title)
+	usrProjects.Projects = append(usrProjects.Projects, string(id))
 
 	//Insert to Users collection
 	usrErr = DB.Operation.Update(bson.M{"email": crProjReq.Email}, usrProjects)
@@ -96,7 +97,7 @@ func (s *server) CreateProject(ctx context.Context, crProjReq *pb.CreateProjectR
 
 	//make sure it's not a duplicate project
 	newProj := &pb.Project{}
-	projErr := DB.Operation.Find(bson.M{"Title": crProjReq.Title}).One(newProj)
+	projErr := DB.Operation.Find(bson.M{"_id": id}).One(newProj)
 
 	if (projErr != nil || newProj != &pb.Project{}) {
 		return &pb.CreateProjectResponse{Success: false}, projErr
@@ -104,6 +105,7 @@ func (s *server) CreateProject(ctx context.Context, crProjReq *pb.CreateProjectR
 
 	//now create the new project entry
 	newProj = &pb.Project{
+		ProjectID:     string(id),
 		Title:         crProjReq.Title,
 		Users:         []string{crProjReq.Email},
 		Description:   crProjReq.Description,
@@ -120,8 +122,8 @@ func (s *server) CreateProject(ctx context.Context, crProjReq *pb.CreateProjectR
 		PendingUsers:  []string{},
 	}
 
-	//Insert to the Projects collection
-	projErr = DB.Operation.Insert(newProj)
+	//Insert to the Projects collection with the new unique id
+	projErr = DB.Operation.Insert(bson.M{"_id": id}, newProj)
 
 	if projErr != nil {
 		return &pb.CreateProjectResponse{Success: false}, projErr
@@ -131,7 +133,7 @@ func (s *server) CreateProject(ctx context.Context, crProjReq *pb.CreateProjectR
 	DB = &mongo{m.DB("tea").C("tags")} //change collection to projects
 
 	//add project title to tags
-	crProjReq.Tags = append(crProjReq.Tags, crProjReq.Title)
+	crProjReq.Tags = append(crProjReq.Tags, newProj.ProjectID)
 
 	//Insert the new title to each in tags collection
 	tagProjs := &pb.TagProjects{}
@@ -143,13 +145,13 @@ func (s *server) CreateProject(ctx context.Context, crProjReq *pb.CreateProjectR
 		}
 		//if tag doesn't exist, create it. Otherwise, update.
 		if (tagProjs == &pb.TagProjects{}) {
-			tagErr := DB.Operation.Insert(bson.M{"Name": v, "Projects": []string{crProjReq.Title}})
+			tagErr := DB.Operation.Insert(bson.M{"Name": v, "Projects": []string{newProj.ProjectID}})
 			if tagErr != nil {
 				return &pb.CreateProjectResponse{Success: false}, tagErr
 			}
 		} else {
 			//append new project title to tag's array of project titles
-			tagProjs.Projects = append(tagProjs.Projects, crProjReq.Title)
+			tagProjs.Projects = append(tagProjs.Projects, newProj.ProjectID)
 			tagErr := DB.Operation.Update(bson.M{"Name": v}, tagProjs)
 			if tagErr != nil {
 				return &pb.CreateProjectResponse{Success: false}, tagErr
@@ -169,7 +171,7 @@ func (s *server) EditProject(ctx context.Context, edProjReq *pb.EditProjectReque
 	DB = &mongo{m.DB("tea").C("projects")} //change collection to projects
 
 	//Update the correct project in the Projects collection
-	err := DB.Operation.Update(bson.M{"Title": edProjReq.Title}, edProjReq)
+	err := DB.Operation.Update(bson.M{"ProjectID": edProjReq.ProjectID}, edProjReq)
 
 	if err != nil {
 		return &pb.EditProjectResponse{Success: false}, err
@@ -188,7 +190,7 @@ func (s *server) JoinProject(ctx context.Context, jProjReq *pb.JoinProjectReques
 
 	//Check current users and pending users
 	currProj := &pb.Project{}
-	err := DB.Operation.Find(bson.M{"Title": jProjReq.Title}).One(currProj)
+	err := DB.Operation.Find(bson.M{"ProjectID": jProjReq.ProjectID}).One(currProj)
 	if err != nil {
 		return &pb.JoinProjectResponse{Success: false}, err
 	}
@@ -207,7 +209,7 @@ func (s *server) JoinProject(ctx context.Context, jProjReq *pb.JoinProjectReques
 
 	//add the new email to the pending list
 	currProj.PendingUsers = append(currProj.PendingUsers, jProjReq.NewEmail)
-	err = DB.Operation.Update(bson.M{"Title": jProjReq.Title}, bson.M{"PendingUsers": currProj.PendingUsers})
+	err = DB.Operation.Update(bson.M{"ProjectID": jProjReq.ProjectID}, bson.M{"PendingUsers": currProj.PendingUsers})
 
 	//if we made it here, we successfully added the user to pending users list
 	return &pb.JoinProjectResponse{Success: true}, nil
@@ -237,17 +239,17 @@ func (s *server) FindProjects(ctx context.Context, findProjReq *pb.FindProjectsR
 			return rtnProjects, err
 		}
 		//go through each project and add each unique one to our return Response
-		for _, projTitle := range currProjs.Projects {
+		for _, projID := range currProjs.Projects {
 			//check if we've already found this project
-			exist := projs[projTitle]
+			exist := projs[projID]
 			if exist {
 				continue
 			}
-			projs[projTitle] = true
+			projs[projID] = true
 			//get project information from projects collection
 			DB = &mongo{m.DB("tea").C("projects")}
 			currProj := &pb.Project{}
-			err := DB.Operation.Find(bson.M{"Title": projTitle}).One(currProj)
+			err := DB.Operation.Find(bson.M{"ProjectID": projID}).One(currProj)
 			if err != nil {
 				//return false and empty array
 				rtnProjects = &pb.FindProjectsResponse{}
@@ -275,7 +277,7 @@ func (s *server) FetchProject(ctx context.Context, fProjReq *pb.FetchProjectRequ
 
 	fetched := &pb.Project{}
 
-	err := DB.Operation.Find(bson.M{"Title": fProjReq.Title}).One(fetched)
+	err := DB.Operation.Find(bson.M{"ProjectID": fProjReq.ProjectID}).One(fetched)
 
 	if err != nil {
 		return &pb.FetchProjectResponse{Success: false, Project: &pb.Project{}}, err
