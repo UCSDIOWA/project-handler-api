@@ -1,0 +1,11 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"path": "project-handler-api",
+			"revision": ""
+		}
+	],
+	"rootPath": "github.com/UCSDIOWA/project-handler-api"
+}
