@@ -11,7 +11,61 @@ service ProjectCreatorAPI {
             body: "*"
         };
     }
+    rpc EditProject (EditProjectRequest) returns (EditProjectResponse) {
+        option (google.api.http) = {
+            post: "/editproject"
+            body: "*"
+        };
+    }
+    rpc FetchProject (FetchProjectRequest) returns (FetchProjectResponse) {
+        option (google.api.http) = {
+            post: "/fetchproject"
+            body: "*"
+        };
+    }
+    rpc JoinProject (JoinProjectRequest) returns (JoinProjectResponse) {
+        option (google.api.http) = {
+            post: "/joinproject"
+            body: "*"
+        };
+    }
+    rpc FindProjects (FindProjectsRequest) returns (FindProjectsResponse) {
+        option (google.api.http) = {
+            post: "/findprojects"
+            body: "*"
+        };
+    }
 }
+
+message Project {
+    string ProjectID = 1;
+    string title = 2;
+    repeated string Users = 3;
+    string description = 4;
+    string deadline = 5;
+    bool private = 6;
+    repeated string Announcements = 7;
+    int32 size = 8;
+    string project_leader = 9;
+    int32 progress_bar = 10;
+    bool done = 11;
+    string calendar = 12;
+    repeated string Milestones = 13;
+    repeated string Tags = 14;
+    repeated string pendingUsers = 15;
+
+}
+
+message UserProjects {
+    string email = 1;
+    repeated string projects = 2;
+}
+
+message TagProjects {
+    string name = 1;
+    repeated string projects = 2;
+}
+
 
 message CreateProjectRequest {
     string email = 1;
@@ -19,8 +73,55 @@ message CreateProjectRequest {
     string description = 3;
     string deadline = 4;
     bool private = 5;
+    repeated string Tags = 6;
 }
 
 message CreateProjectResponse {
     bool success = 1;
+}
+
+message FetchProjectRequest {
+    string email = 1;
+    string ProjectID = 2;
+}
+
+message FetchProjectResponse {
+    bool success = 1;
+    Project project = 2;
+}
+
+message EditProjectRequest {
+    string ProjectID = 1;
+    string title = 2;
+    repeated string Users = 3;
+    string description = 4;
+    string deadline = 5;
+    bool private = 6;
+    int32 size = 7;
+    string project_leader = 8;
+    bool done = 9;
+    string calendar = 10;
+    repeated string Tags = 11;
+}
+
+message EditProjectResponse {
+    bool success = 1;
+}
+
+message JoinProjectRequest {
+    string ProjectID = 1;
+    string newEmail = 2;
+}
+
+message JoinProjectResponse {
+    bool success = 1;
+}
+
+message FindProjectsRequest {
+    repeated string Tags = 1;
+}
+
+message FindProjectsResponse {
+    bool success = 1;
+    repeated Project projects = 2;
 }
