@@ -11,10 +11,17 @@ service ProjectCreatorAPI {
             body: "*"
         };
     }
+
+    rpc FetchProject (FetchProjectRequest) returns (FetchProjectResponse) {
+        option (google.api.http) = {
+            post: "/fetchproject"
+            body: "*"
+        };
+    }
 }
 
 message CreateProjectRequest {
-    string id = 1;
+    string xid = 1;
     string title = 2;
     string projectleader = 3;
     int32 percentdone = 4;
@@ -32,4 +39,24 @@ message CreateProjectRequest {
 
 message CreateProjectResponse {
     bool success = 1;
+}
+
+message FetchProjectRequest {
+    string xid = 1;
+}
+
+message FetchProjectResponse {
+    string title = 2;
+    string projectleader = 3;
+    int32 percentdone = 4;
+    int32 groupsize = 5;
+    bool isprivate = 6;
+    repeated string tags = 7;
+    string deadline = 8;
+    string calendarid = 9;
+    string description = 10;
+    repeated string joinrequests = 11;
+    repeated string memberslist = 12;
+    repeated string milestones = 13;
+    repeated string announcements = 14; 
 }

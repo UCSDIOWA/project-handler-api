@@ -55,7 +55,7 @@ func main() {
 func startGRPC() error {
 	// Host mongo server
 	var err error
-	m, err = mgo.Dial("mongodb://tea:cse110IOWA@ds159263.mlab.com:59263/tea")
+	m, err = mgo.Dial("127.0.0.1:27017")
 	if err != nil {
 		log.Fatalf("Could not connect to the MongoDB server: %v", err)
 	}
@@ -112,11 +112,21 @@ func startHTTP() error {
 
 /* This function creates a project for a given user */
 func (s *server) CreateProject(ctx context.Context, request *pb.CreateProjectRequest) (*pb.CreateProjectResponse, error) {
-	request.Id = bson.NewObjectId().String()
+	request.Xid = bson.NewObjectId().Hex()
 	err := DB.Operation.Insert(request)
 	if err != nil {
 		return &pb.CreateProjectResponse{Success: false}, nil
 	}
 
 	return &pb.CreateProjectResponse{Success: true}, nil
+}
+
+func (s *server) FetchProject(ctx context.Context, request *pb.FetchProjectRequest) (*pb.FetchProjectResponse, error) {
+	var response pb.FetchProjectResponse
+	err := DB.Operation.Find(bson.M{"xid": request.Xid}).One(&response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
 }
