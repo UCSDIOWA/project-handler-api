@@ -155,28 +155,34 @@ func (s *server) GetAllProjects(ctx context.Context, request *pb.GetAllProjectsR
 		return nil, err
 	}
 
+	invalidProjects := make(map[int]bool)
+
 	for _, currentXid := range userProjects.CurrentProjects {
-		for k := 0; k < len(allProjects); k++ {
-			if currentXid != allProjects[k].Xid {
-				if allProjects[k].Done == false && allProjects[k].Isprivate == false {
-					var newProject pb.Projects
-					newProject.Title = allProjects[k].Title
-					newProject.Projectleader = allProjects[k].Projectleader
-					newProject.Percentdone = allProjects[k].Percentdone
-					newProject.Groupsize = allProjects[k].Groupsize
-					newProject.Isprivate = allProjects[k].Isprivate
-					newProject.Tags = allProjects[k].Tags
-					newProject.Deadline = allProjects[k].Deadline
-					newProject.Calendarid = allProjects[k].Calendarid
-					newProject.Description = allProjects[k].Description
-					newProject.Done = allProjects[k].Done
-					newProject.Joinrequests = allProjects[k].Joinrequests
-					newProject.Memberslist = allProjects[k].Memberslist
-					newProject.Milestones = allProjects[k].Milestones
-					newProject.Announcements = allProjects[k].Announcements
-					response.Projects = append(response.Projects, &newProject)
-				}
+		for i := 0; i < len(allProjects); i++ {
+			if currentXid == allProjects[i].Xid {
+				invalidProjects[i] = true
 			}
+		}
+	}
+
+	for i := 0; i < len(allProjects); i++ {
+		if !invalidProjects[i] && !allProjects[i].Done && !allProjects[i].Isprivate {
+			var newProject pb.Projects
+			newProject.Title = allProjects[i].Title
+			newProject.Projectleader = allProjects[i].Projectleader
+			newProject.Percentdone = allProjects[i].Percentdone
+			newProject.Groupsize = allProjects[i].Groupsize
+			newProject.Isprivate = allProjects[i].Isprivate
+			newProject.Tags = allProjects[i].Tags
+			newProject.Deadline = allProjects[i].Deadline
+			newProject.Calendarid = allProjects[i].Calendarid
+			newProject.Description = allProjects[i].Description
+			newProject.Done = allProjects[i].Done
+			newProject.Joinrequests = allProjects[i].Joinrequests
+			newProject.Memberslist = allProjects[i].Memberslist
+			newProject.Milestones = allProjects[i].Milestones
+			newProject.Announcements = allProjects[i].Announcements
+			response.Projects = append(response.Projects, &newProject)
 		}
 	}
 
