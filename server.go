@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -78,7 +77,7 @@ func main() {
 func startGRPC() error {
 	// Host mongo server
 	var err error
-	m, err = mgo.Dial("127.0.0.1:27017")
+	m, err = mgo.Dial("mongodb://tea:cse110IOWA@ds159263.mlab.com:59263/tea")
 	if err != nil {
 		log.Fatalf("Could not connect to the MongoDB server: %v", err)
 	}
@@ -165,7 +164,6 @@ func (s *server) GetAllProjects(ctx context.Context, request *pb.GetAllProjectsR
 					newProject.Percentdone = allProjects[k].Percentdone
 					newProject.Groupsize = allProjects[k].Groupsize
 					newProject.Isprivate = allProjects[k].Isprivate
-					fmt.Println(allProjects[k].Isprivate)
 					newProject.Tags = allProjects[k].Tags
 					newProject.Deadline = allProjects[k].Deadline
 					newProject.Calendarid = allProjects[k].Calendarid
