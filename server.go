@@ -158,7 +158,7 @@ func (s *server) GetAllProjects(ctx context.Context, request *pb.GetAllProjectsR
 	for _, currentXid := range userProjects.CurrentProjects {
 		for k := 0; k < len(allProjects); k++ {
 			if currentXid != allProjects[k].Xid {
-				if allProjects[k].Done == false {
+				if allProjects[k].Done == false && allProjects[k].Isprivate == false {
 					var newProject pb.Projects
 					newProject.Title = allProjects[k].Title
 					newProject.Projectleader = allProjects[k].Projectleader
