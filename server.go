@@ -127,6 +127,7 @@ func startHTTP() error {
 
 /* This function creates a project for a given user */
 func (s *server) CreateProject(ctx context.Context, request *pb.CreateProjectRequest) (*pb.CreateProjectResponse, error) {
+	DB = &mongo{m.DB("tea").C("projects")}
 	request.Xid = bson.NewObjectId().Hex()
 	err := DB.Operation.Insert(request)
 	if err != nil {
