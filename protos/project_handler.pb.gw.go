@@ -41,15 +41,15 @@ func request_ProjectCreatorAPI_CreateProject_0(ctx context.Context, marshaler ru
 
 }
 
-func request_ProjectCreatorAPI_FetchProject_0(ctx context.Context, marshaler runtime.Marshaler, client ProjectCreatorAPIClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq FetchProjectRequest
+func request_ProjectCreatorAPI_GetAllProjects_0(ctx context.Context, marshaler runtime.Marshaler, client ProjectCreatorAPIClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetAllProjectsRequest
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.FetchProject(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetAllProjects(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -121,7 +121,7 @@ func RegisterProjectCreatorAPIHandlerClient(ctx context.Context, mux *runtime.Se
 
 	})
 
-	mux.Handle("POST", pattern_ProjectCreatorAPI_FetchProject_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ProjectCreatorAPI_GetAllProjects_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -139,14 +139,14 @@ func RegisterProjectCreatorAPIHandlerClient(ctx context.Context, mux *runtime.Se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ProjectCreatorAPI_FetchProject_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ProjectCreatorAPI_GetAllProjects_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ProjectCreatorAPI_FetchProject_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ProjectCreatorAPI_GetAllProjects_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -156,11 +156,11 @@ func RegisterProjectCreatorAPIHandlerClient(ctx context.Context, mux *runtime.Se
 var (
 	pattern_ProjectCreatorAPI_CreateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"createproject"}, ""))
 
-	pattern_ProjectCreatorAPI_FetchProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"fetchproject"}, ""))
+	pattern_ProjectCreatorAPI_GetAllProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"getallprojects"}, ""))
 )
 
 var (
 	forward_ProjectCreatorAPI_CreateProject_0 = runtime.ForwardResponseMessage
 
-	forward_ProjectCreatorAPI_FetchProject_0 = runtime.ForwardResponseMessage
+	forward_ProjectCreatorAPI_GetAllProjects_0 = runtime.ForwardResponseMessage
 )

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -21,6 +22,28 @@ type server struct{}
 
 type mongo struct {
 	Operation *mgo.Collection
+}
+
+type getUserProjects struct {
+	CurrentProjects []string `json:"currentprojects" bson:"currentprojects"`
+}
+
+type getAllProjects struct {
+	Xid           string   `json:"xid" bson:"xid"`
+	Title         string   `json:"title" bson:"title"`
+	Projectleader string   `json:"projectleader" bson:"projectleader"`
+	Percentdone   int32    `json:"percentdone" bson:"percentdone"`
+	Groupsize     int32    `json:"groupsize" bson:"groupsize"`
+	Isprivate     bool     `json:"isprivate" bson:"isprivate"`
+	Tags          []string `json:"tags" bson:"tags"`
+	Deadline      string   `json:"deadline" bson:"deadline"`
+	Calendarid    string   `json:"calendarid" bson:"calendarid"`
+	Description   string   `json:"description" bson:"description"`
+	Done          bool     `json:"done" bson:"done"`
+	Joinrequests  []string `json:"joinrequests" bson:"joinrequests"`
+	Memberslist   []string `json:"memberslist" bson:"memberslist"`
+	Milestones    []string `json:"milestones" bson:"milestones"`
+	Announcements []string `json:"announcements" bson:"announcements"`
 }
 
 // Host mongo server. Updating scope of of m
@@ -55,7 +78,7 @@ func main() {
 func startGRPC() error {
 	// Host mongo server
 	var err error
-	m, err = mgo.Dial("mongodb://tea:cse110IOWA@ds159263.mlab.com:59263/tea")
+	m, err = mgo.Dial("127.0.0.1:27017")
 	if err != nil {
 		log.Fatalf("Could not connect to the MongoDB server: %v", err)
 	}
@@ -64,13 +87,6 @@ func startGRPC() error {
 
 	// Accessing user collection in tea database
 	DB = &mongo{m.DB("tea").C("projects")}
-	// Using email to find users in the database. Won't allow duplicated emails.
-	DB.Operation.EnsureIndex(mgo.Index{
-		Key:        []string{"email"},
-		Unique:     true,
-		DropDups:   true,
-		Background: true,
-		Sparse:     true})
 
 	// Host grpc server
 	listen, err := net.Listen("tcp", "127.0.0.1:50052")
@@ -121,11 +137,48 @@ func (s *server) CreateProject(ctx context.Context, request *pb.CreateProjectReq
 	return &pb.CreateProjectResponse{Success: true}, nil
 }
 
-func (s *server) FetchProject(ctx context.Context, request *pb.FetchProjectRequest) (*pb.FetchProjectResponse, error) {
-	var response pb.FetchProjectResponse
-	err := DB.Operation.Find(bson.M{"xid": request.Xid}).One(&response)
+func (s *server) GetAllProjects(ctx context.Context, request *pb.GetAllProjectsRequest) (*pb.GetAllProjectsResponse, error) {
+	var userProjects getUserProjects
+	var allProjects []getAllProjects
+	var response pb.GetAllProjectsResponse
+
+	DB = &mongo{m.DB("tea").C("users")}
+	err := DB.Operation.Find(bson.M{"email": request.Email}).One(&userProjects)
 	if err != nil {
 		return nil, err
+	}
+
+	DB = &mongo{m.DB("tea").C("projects")}
+	iter := DB.Operation.Find(nil).Iter()
+	err = iter.All(&allProjects)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, currentXid := range userProjects.CurrentProjects {
+		for k := 0; k < len(allProjects); k++ {
+			if currentXid != allProjects[k].Xid {
+				if allProjects[k].Done == false {
+					var newProject pb.Projects
+					newProject.Title = allProjects[k].Title
+					newProject.Projectleader = allProjects[k].Projectleader
+					newProject.Percentdone = allProjects[k].Percentdone
+					newProject.Groupsize = allProjects[k].Groupsize
+					newProject.Isprivate = allProjects[k].Isprivate
+					fmt.Println(allProjects[k].Isprivate)
+					newProject.Tags = allProjects[k].Tags
+					newProject.Deadline = allProjects[k].Deadline
+					newProject.Calendarid = allProjects[k].Calendarid
+					newProject.Description = allProjects[k].Description
+					newProject.Done = allProjects[k].Done
+					newProject.Joinrequests = allProjects[k].Joinrequests
+					newProject.Memberslist = allProjects[k].Memberslist
+					newProject.Milestones = allProjects[k].Milestones
+					newProject.Announcements = allProjects[k].Announcements
+					response.Projects = append(response.Projects, &newProject)
+				}
+			}
+		}
 	}
 
 	return &response, nil

@@ -34,10 +34,11 @@ type CreateProjectRequest struct {
 	Deadline             string   `protobuf:"bytes,8,opt,name=deadline,proto3" json:"deadline,omitempty"`
 	Calendarid           string   `protobuf:"bytes,9,opt,name=calendarid,proto3" json:"calendarid,omitempty"`
 	Description          string   `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
-	Joinrequests         []string `protobuf:"bytes,11,rep,name=joinrequests,proto3" json:"joinrequests,omitempty"`
-	Memberslist          []string `protobuf:"bytes,12,rep,name=memberslist,proto3" json:"memberslist,omitempty"`
-	Milestones           []string `protobuf:"bytes,13,rep,name=milestones,proto3" json:"milestones,omitempty"`
-	Announcements        []string `protobuf:"bytes,14,rep,name=announcements,proto3" json:"announcements,omitempty"`
+	Done                 bool     `protobuf:"varint,11,opt,name=done,proto3" json:"done,omitempty"`
+	Joinrequests         []string `protobuf:"bytes,12,rep,name=joinrequests,proto3" json:"joinrequests,omitempty"`
+	Memberslist          []string `protobuf:"bytes,13,rep,name=memberslist,proto3" json:"memberslist,omitempty"`
+	Milestones           []string `protobuf:"bytes,14,rep,name=milestones,proto3" json:"milestones,omitempty"`
+	Announcements        []string `protobuf:"bytes,15,rep,name=announcements,proto3" json:"announcements,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -138,6 +139,13 @@ func (m *CreateProjectRequest) GetDescription() string {
 	return ""
 }
 
+func (m *CreateProjectRequest) GetDone() bool {
+	if m != nil {
+		return m.Done
+	}
+	return false
+}
+
 func (m *CreateProjectRequest) GetJoinrequests() []string {
 	if m != nil {
 		return m.Joinrequests
@@ -205,55 +213,56 @@ func (m *CreateProjectResponse) GetSuccess() bool {
 	return false
 }
 
-type FetchProjectRequest struct {
-	Xid                  string   `protobuf:"bytes,1,opt,name=xid,proto3" json:"xid,omitempty"`
+type GetAllProjectsRequest struct {
+	Email                string   `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *FetchProjectRequest) Reset()         { *m = FetchProjectRequest{} }
-func (m *FetchProjectRequest) String() string { return proto.CompactTextString(m) }
-func (*FetchProjectRequest) ProtoMessage()    {}
-func (*FetchProjectRequest) Descriptor() ([]byte, []int) {
+func (m *GetAllProjectsRequest) Reset()         { *m = GetAllProjectsRequest{} }
+func (m *GetAllProjectsRequest) String() string { return proto.CompactTextString(m) }
+func (*GetAllProjectsRequest) ProtoMessage()    {}
+func (*GetAllProjectsRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_4b74e335e85f3fb3, []int{2}
 }
 
-func (m *FetchProjectRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_FetchProjectRequest.Unmarshal(m, b)
+func (m *GetAllProjectsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetAllProjectsRequest.Unmarshal(m, b)
 }
-func (m *FetchProjectRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_FetchProjectRequest.Marshal(b, m, deterministic)
+func (m *GetAllProjectsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetAllProjectsRequest.Marshal(b, m, deterministic)
 }
-func (m *FetchProjectRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FetchProjectRequest.Merge(m, src)
+func (m *GetAllProjectsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetAllProjectsRequest.Merge(m, src)
 }
-func (m *FetchProjectRequest) XXX_Size() int {
-	return xxx_messageInfo_FetchProjectRequest.Size(m)
+func (m *GetAllProjectsRequest) XXX_Size() int {
+	return xxx_messageInfo_GetAllProjectsRequest.Size(m)
 }
-func (m *FetchProjectRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_FetchProjectRequest.DiscardUnknown(m)
+func (m *GetAllProjectsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetAllProjectsRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_FetchProjectRequest proto.InternalMessageInfo
+var xxx_messageInfo_GetAllProjectsRequest proto.InternalMessageInfo
 
-func (m *FetchProjectRequest) GetXid() string {
+func (m *GetAllProjectsRequest) GetEmail() string {
 	if m != nil {
-		return m.Xid
+		return m.Email
 	}
 	return ""
 }
 
-type FetchProjectResponse struct {
-	Title                string   `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Projectleader        string   `protobuf:"bytes,3,opt,name=projectleader,proto3" json:"projectleader,omitempty"`
-	Percentdone          int32    `protobuf:"varint,4,opt,name=percentdone,proto3" json:"percentdone,omitempty"`
-	Groupsize            int32    `protobuf:"varint,5,opt,name=groupsize,proto3" json:"groupsize,omitempty"`
-	Isprivate            bool     `protobuf:"varint,6,opt,name=isprivate,proto3" json:"isprivate,omitempty"`
-	Tags                 []string `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty"`
-	Deadline             string   `protobuf:"bytes,8,opt,name=deadline,proto3" json:"deadline,omitempty"`
-	Calendarid           string   `protobuf:"bytes,9,opt,name=calendarid,proto3" json:"calendarid,omitempty"`
-	Description          string   `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
+type Projects struct {
+	Title                string   `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Projectleader        string   `protobuf:"bytes,2,opt,name=projectleader,proto3" json:"projectleader,omitempty"`
+	Percentdone          int32    `protobuf:"varint,3,opt,name=percentdone,proto3" json:"percentdone,omitempty"`
+	Groupsize            int32    `protobuf:"varint,4,opt,name=groupsize,proto3" json:"groupsize,omitempty"`
+	Isprivate            bool     `protobuf:"varint,5,opt,name=isprivate,proto3" json:"isprivate,omitempty"`
+	Tags                 []string `protobuf:"bytes,6,rep,name=tags,proto3" json:"tags,omitempty"`
+	Deadline             string   `protobuf:"bytes,7,opt,name=deadline,proto3" json:"deadline,omitempty"`
+	Calendarid           string   `protobuf:"bytes,8,opt,name=calendarid,proto3" json:"calendarid,omitempty"`
+	Description          string   `protobuf:"bytes,9,opt,name=description,proto3" json:"description,omitempty"`
+	Done                 bool     `protobuf:"varint,10,opt,name=done,proto3" json:"done,omitempty"`
 	Joinrequests         []string `protobuf:"bytes,11,rep,name=joinrequests,proto3" json:"joinrequests,omitempty"`
 	Memberslist          []string `protobuf:"bytes,12,rep,name=memberslist,proto3" json:"memberslist,omitempty"`
 	Milestones           []string `protobuf:"bytes,13,rep,name=milestones,proto3" json:"milestones,omitempty"`
@@ -263,118 +272,164 @@ type FetchProjectResponse struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *FetchProjectResponse) Reset()         { *m = FetchProjectResponse{} }
-func (m *FetchProjectResponse) String() string { return proto.CompactTextString(m) }
-func (*FetchProjectResponse) ProtoMessage()    {}
-func (*FetchProjectResponse) Descriptor() ([]byte, []int) {
+func (m *Projects) Reset()         { *m = Projects{} }
+func (m *Projects) String() string { return proto.CompactTextString(m) }
+func (*Projects) ProtoMessage()    {}
+func (*Projects) Descriptor() ([]byte, []int) {
 	return fileDescriptor_4b74e335e85f3fb3, []int{3}
 }
 
-func (m *FetchProjectResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_FetchProjectResponse.Unmarshal(m, b)
+func (m *Projects) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Projects.Unmarshal(m, b)
 }
-func (m *FetchProjectResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_FetchProjectResponse.Marshal(b, m, deterministic)
+func (m *Projects) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Projects.Marshal(b, m, deterministic)
 }
-func (m *FetchProjectResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FetchProjectResponse.Merge(m, src)
+func (m *Projects) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Projects.Merge(m, src)
 }
-func (m *FetchProjectResponse) XXX_Size() int {
-	return xxx_messageInfo_FetchProjectResponse.Size(m)
+func (m *Projects) XXX_Size() int {
+	return xxx_messageInfo_Projects.Size(m)
 }
-func (m *FetchProjectResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_FetchProjectResponse.DiscardUnknown(m)
+func (m *Projects) XXX_DiscardUnknown() {
+	xxx_messageInfo_Projects.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_FetchProjectResponse proto.InternalMessageInfo
+var xxx_messageInfo_Projects proto.InternalMessageInfo
 
-func (m *FetchProjectResponse) GetTitle() string {
+func (m *Projects) GetTitle() string {
 	if m != nil {
 		return m.Title
 	}
 	return ""
 }
 
-func (m *FetchProjectResponse) GetProjectleader() string {
+func (m *Projects) GetProjectleader() string {
 	if m != nil {
 		return m.Projectleader
 	}
 	return ""
 }
 
-func (m *FetchProjectResponse) GetPercentdone() int32 {
+func (m *Projects) GetPercentdone() int32 {
 	if m != nil {
 		return m.Percentdone
 	}
 	return 0
 }
 
-func (m *FetchProjectResponse) GetGroupsize() int32 {
+func (m *Projects) GetGroupsize() int32 {
 	if m != nil {
 		return m.Groupsize
 	}
 	return 0
 }
 
-func (m *FetchProjectResponse) GetIsprivate() bool {
+func (m *Projects) GetIsprivate() bool {
 	if m != nil {
 		return m.Isprivate
 	}
 	return false
 }
 
-func (m *FetchProjectResponse) GetTags() []string {
+func (m *Projects) GetTags() []string {
 	if m != nil {
 		return m.Tags
 	}
 	return nil
 }
 
-func (m *FetchProjectResponse) GetDeadline() string {
+func (m *Projects) GetDeadline() string {
 	if m != nil {
 		return m.Deadline
 	}
 	return ""
 }
 
-func (m *FetchProjectResponse) GetCalendarid() string {
+func (m *Projects) GetCalendarid() string {
 	if m != nil {
 		return m.Calendarid
 	}
 	return ""
 }
 
-func (m *FetchProjectResponse) GetDescription() string {
+func (m *Projects) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *FetchProjectResponse) GetJoinrequests() []string {
+func (m *Projects) GetDone() bool {
+	if m != nil {
+		return m.Done
+	}
+	return false
+}
+
+func (m *Projects) GetJoinrequests() []string {
 	if m != nil {
 		return m.Joinrequests
 	}
 	return nil
 }
 
-func (m *FetchProjectResponse) GetMemberslist() []string {
+func (m *Projects) GetMemberslist() []string {
 	if m != nil {
 		return m.Memberslist
 	}
 	return nil
 }
 
-func (m *FetchProjectResponse) GetMilestones() []string {
+func (m *Projects) GetMilestones() []string {
 	if m != nil {
 		return m.Milestones
 	}
 	return nil
 }
 
-func (m *FetchProjectResponse) GetAnnouncements() []string {
+func (m *Projects) GetAnnouncements() []string {
 	if m != nil {
 		return m.Announcements
+	}
+	return nil
+}
+
+type GetAllProjectsResponse struct {
+	Projects             []*Projects `protobuf:"bytes,1,rep,name=projects,proto3" json:"projects,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
+}
+
+func (m *GetAllProjectsResponse) Reset()         { *m = GetAllProjectsResponse{} }
+func (m *GetAllProjectsResponse) String() string { return proto.CompactTextString(m) }
+func (*GetAllProjectsResponse) ProtoMessage()    {}
+func (*GetAllProjectsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4b74e335e85f3fb3, []int{4}
+}
+
+func (m *GetAllProjectsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetAllProjectsResponse.Unmarshal(m, b)
+}
+func (m *GetAllProjectsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetAllProjectsResponse.Marshal(b, m, deterministic)
+}
+func (m *GetAllProjectsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetAllProjectsResponse.Merge(m, src)
+}
+func (m *GetAllProjectsResponse) XXX_Size() int {
+	return xxx_messageInfo_GetAllProjectsResponse.Size(m)
+}
+func (m *GetAllProjectsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetAllProjectsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetAllProjectsResponse proto.InternalMessageInfo
+
+func (m *GetAllProjectsResponse) GetProjects() []*Projects {
+	if m != nil {
+		return m.Projects
 	}
 	return nil
 }
@@ -382,44 +437,51 @@ func (m *FetchProjectResponse) GetAnnouncements() []string {
 func init() {
 	proto.RegisterType((*CreateProjectRequest)(nil), "project_creator.CreateProjectRequest")
 	proto.RegisterType((*CreateProjectResponse)(nil), "project_creator.CreateProjectResponse")
-	proto.RegisterType((*FetchProjectRequest)(nil), "project_creator.FetchProjectRequest")
-	proto.RegisterType((*FetchProjectResponse)(nil), "project_creator.FetchProjectResponse")
+	proto.RegisterType((*GetAllProjectsRequest)(nil), "project_creator.GetAllProjectsRequest")
+	proto.RegisterType((*Projects)(nil), "project_creator.Projects")
+	proto.RegisterType((*GetAllProjectsResponse)(nil), "project_creator.GetAllProjectsResponse")
 }
 
 func init() { proto.RegisterFile("protos/project_handler.proto", fileDescriptor_4b74e335e85f3fb3) }
 
 var fileDescriptor_4b74e335e85f3fb3 = []byte{
-	// 474 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x94, 0xc1, 0x6e, 0x13, 0x31,
-	0x10, 0x86, 0xb5, 0xd9, 0xa6, 0x4d, 0xa6, 0x49, 0x01, 0x37, 0x48, 0x26, 0x8a, 0xd0, 0x6a, 0xd5,
-	0x42, 0xc4, 0x21, 0x2b, 0xe0, 0xc6, 0x0d, 0x55, 0x42, 0xe2, 0x56, 0xed, 0x0b, 0x20, 0x77, 0x3d,
-	0xa4, 0xae, 0x36, 0xf6, 0xe2, 0xf1, 0x22, 0xe0, 0x88, 0xc4, 0x13, 0xf0, 0x1e, 0x3c, 0x03, 0xef,
-	0xc0, 0x2b, 0xf0, 0x20, 0xc8, 0xde, 0x2d, 0xd9, 0x2d, 0x95, 0x72, 0xe5, 0xd0, 0x9b, 0xfd, 0xcd,
-	0x6f, 0xcf, 0x68, 0xe6, 0xd7, 0xc0, 0xa2, 0xb2, 0xc6, 0x19, 0xca, 0x2a, 0x6b, 0xae, 0xb0, 0x70,
-	0xef, 0x2e, 0x85, 0x96, 0x25, 0xda, 0x55, 0xc0, 0xec, 0xde, 0x35, 0x2e, 0x2c, 0x0a, 0x67, 0xec,
-	0x7c, 0xb1, 0x36, 0x66, 0x5d, 0x62, 0x26, 0x2a, 0x95, 0x09, 0xad, 0x8d, 0x13, 0x4e, 0x19, 0x4d,
-	0x8d, 0x3c, 0xfd, 0x19, 0xc3, 0xec, 0xcc, 0x2b, 0xf1, 0xbc, 0x79, 0x97, 0xe3, 0x87, 0x1a, 0xc9,
-	0xb1, 0xfb, 0x10, 0x7f, 0x52, 0x92, 0x47, 0x49, 0xb4, 0x1c, 0xe7, 0xfe, 0xc8, 0x66, 0x30, 0x74,
-	0xca, 0x95, 0xc8, 0x07, 0x81, 0x35, 0x17, 0x76, 0x02, 0xd3, 0x36, 0x63, 0x89, 0x42, 0xa2, 0xe5,
-	0x71, 0x88, 0xf6, 0x21, 0x4b, 0xe0, 0xb0, 0x42, 0x5b, 0xa0, 0x76, 0xd2, 0x68, 0xe4, 0x7b, 0x49,
-	0xb4, 0x1c, 0xe6, 0x5d, 0xc4, 0x16, 0x30, 0x5e, 0x5b, 0x53, 0x57, 0xa4, 0xbe, 0x20, 0x1f, 0x86,
-	0xf8, 0x16, 0xf8, 0xa8, 0xa2, 0xca, 0xaa, 0x8f, 0xc2, 0x21, 0xdf, 0x4f, 0xa2, 0xe5, 0x28, 0xdf,
-	0x02, 0xc6, 0x60, 0xcf, 0x89, 0x35, 0xf1, 0x83, 0x24, 0x5e, 0x8e, 0xf3, 0x70, 0x66, 0x73, 0x18,
-	0x49, 0x14, 0xb2, 0x54, 0x1a, 0xf9, 0x28, 0x94, 0xf4, 0xf7, 0xce, 0x1e, 0x03, 0x14, 0xa2, 0x44,
-	0x2d, 0x85, 0x55, 0x92, 0x8f, 0x43, 0xb4, 0x43, 0x7c, 0xb5, 0x12, 0xa9, 0xb0, 0xaa, 0xf2, 0xad,
-	0xe2, 0x10, 0x04, 0x5d, 0xc4, 0x52, 0x98, 0x5c, 0x19, 0xa5, 0x6d, 0xd3, 0x2c, 0xe2, 0x87, 0x21,
-	0x73, 0x8f, 0xf9, 0x5f, 0x36, 0xb8, 0xb9, 0x40, 0x4b, 0xa5, 0x22, 0xc7, 0x27, 0x41, 0xd2, 0x45,
-	0xbe, 0x8e, 0x8d, 0x2a, 0x91, 0x9c, 0xd1, 0x48, 0x7c, 0x1a, 0x04, 0x1d, 0xe2, 0x7b, 0xeb, 0x27,
-	0x56, 0xeb, 0x02, 0x37, 0xa8, 0x1d, 0xf1, 0xa3, 0x20, 0xe9, 0xc3, 0xf4, 0x39, 0x3c, 0xbc, 0x31,
-	0x41, 0xaa, 0x8c, 0x26, 0x64, 0x1c, 0x0e, 0xa8, 0x2e, 0x0a, 0x24, 0x0a, 0x63, 0x1c, 0xe5, 0xd7,
-	0xd7, 0xf4, 0x29, 0x1c, 0xbf, 0x41, 0x57, 0x5c, 0xee, 0x9a, 0x79, 0xfa, 0x23, 0x86, 0x59, 0x5f,
-	0xd9, 0xfe, 0x7d, 0x67, 0x86, 0xff, 0xd2, 0x0c, 0x2f, 0xbe, 0x0d, 0xe0, 0x41, 0x3b, 0xab, 0xb3,
-	0x66, 0x01, 0xbc, 0x3e, 0x7f, 0xcb, 0x3e, 0xc3, 0xb4, 0x67, 0x11, 0x76, 0xba, 0xba, 0xb1, 0x26,
-	0x56, 0xb7, 0x2d, 0x81, 0xf9, 0x93, 0x5d, 0xb2, 0xc6, 0x0d, 0xe9, 0xa3, 0xaf, 0xbf, 0x7e, 0x7f,
-	0x1f, 0x1c, 0xa7, 0x47, 0x59, 0xd0, 0x61, 0xfb, 0xea, 0x55, 0xf4, 0x8c, 0xd5, 0x30, 0xe9, 0x1a,
-	0x88, 0x9d, 0xfc, 0xf3, 0xe5, 0x2d, 0x4e, 0x9c, 0x9f, 0xee, 0x50, 0xb5, 0x79, 0x79, 0xc8, 0xcb,
-	0xd2, 0x69, 0xf6, 0xde, 0x87, 0xb7, 0x69, 0x2f, 0xf6, 0xc3, 0x7a, 0x7b, 0xf9, 0x27, 0x00, 0x00,
-	0xff, 0xff, 0xa7, 0xdd, 0x3c, 0x10, 0x2d, 0x05, 0x00, 0x00,
+	// 562 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x94, 0xcd, 0x6e, 0x13, 0x31,
+	0x10, 0xc7, 0xb5, 0xd9, 0x7c, 0x6c, 0x26, 0x5f, 0x60, 0x52, 0xe4, 0x46, 0x11, 0x8a, 0x56, 0x7c,
+	0x44, 0x95, 0x48, 0x44, 0x11, 0x97, 0xde, 0xaa, 0x1e, 0x10, 0x27, 0xaa, 0x7d, 0x01, 0xe4, 0xee,
+	0x8e, 0x82, 0x2b, 0xc7, 0x5e, 0x6c, 0x07, 0x01, 0x12, 0x17, 0xee, 0x9c, 0x78, 0x17, 0x5e, 0x04,
+	0x1e, 0x81, 0x07, 0x41, 0xeb, 0xdd, 0x7c, 0x36, 0xc9, 0xf6, 0x66, 0xff, 0xfd, 0x1f, 0xcf, 0x78,
+	0xe6, 0x27, 0xc3, 0x30, 0xd5, 0xca, 0x2a, 0x33, 0x4d, 0xb5, 0xba, 0xc5, 0xd8, 0x7e, 0xf8, 0xc8,
+	0x64, 0x22, 0x50, 0x4f, 0x9c, 0x4c, 0x7a, 0x4b, 0x39, 0xd6, 0xc8, 0xac, 0xd2, 0x83, 0xe1, 0x4c,
+	0xa9, 0x99, 0xc0, 0x29, 0x4b, 0xf9, 0x94, 0x49, 0xa9, 0x2c, 0xb3, 0x5c, 0x49, 0x93, 0xdb, 0xc3,
+	0xbf, 0x3e, 0xf4, 0xaf, 0x32, 0x27, 0x5e, 0xe7, 0x71, 0x11, 0x7e, 0x5a, 0xa0, 0xb1, 0xe4, 0x01,
+	0xf8, 0x5f, 0x78, 0x42, 0xbd, 0x91, 0x37, 0x6e, 0x46, 0xd9, 0x92, 0xf4, 0xa1, 0x66, 0xb9, 0x15,
+	0x48, 0x2b, 0x4e, 0xcb, 0x37, 0xe4, 0x29, 0x74, 0x8a, 0x8c, 0x02, 0x59, 0x82, 0x9a, 0xfa, 0xee,
+	0x74, 0x5b, 0x24, 0x23, 0x68, 0xa5, 0xa8, 0x63, 0x94, 0x36, 0x51, 0x12, 0x69, 0x75, 0xe4, 0x8d,
+	0x6b, 0xd1, 0xa6, 0x44, 0x86, 0xd0, 0x9c, 0x69, 0xb5, 0x48, 0x0d, 0xff, 0x86, 0xb4, 0xe6, 0xce,
+	0xd7, 0x42, 0x76, 0xca, 0x4d, 0xaa, 0xf9, 0x67, 0x66, 0x91, 0xd6, 0x47, 0xde, 0x38, 0x88, 0xd6,
+	0x02, 0x21, 0x50, 0xb5, 0x6c, 0x66, 0x68, 0x63, 0xe4, 0x8f, 0x9b, 0x91, 0x5b, 0x93, 0x01, 0x04,
+	0x09, 0xb2, 0x44, 0x70, 0x89, 0x34, 0x70, 0x25, 0xad, 0xf6, 0xe4, 0x09, 0x40, 0xcc, 0x04, 0xca,
+	0x84, 0x69, 0x9e, 0xd0, 0xa6, 0x3b, 0xdd, 0x50, 0xb2, 0x6a, 0x13, 0x34, 0xb1, 0xe6, 0x69, 0xd6,
+	0x2a, 0x0a, 0xce, 0xb0, 0x29, 0x65, 0x19, 0xdd, 0x43, 0x5a, 0xae, 0x14, 0xb7, 0x26, 0x21, 0xb4,
+	0x6f, 0x15, 0x97, 0x3a, 0x6f, 0xa0, 0xa1, 0x6d, 0x57, 0xcd, 0x96, 0x96, 0xdd, 0x3c, 0xc7, 0xf9,
+	0x0d, 0x6a, 0x23, 0xb8, 0xb1, 0xb4, 0xe3, 0x2c, 0x9b, 0x52, 0x56, 0xdb, 0x9c, 0x0b, 0x34, 0x56,
+	0x49, 0x34, 0xb4, 0xeb, 0x0c, 0x1b, 0x4a, 0xd6, 0xef, 0x6c, 0x8a, 0x0b, 0x19, 0xe3, 0x1c, 0xa5,
+	0x35, 0xb4, 0xe7, 0x2c, 0xdb, 0x62, 0xf8, 0x0a, 0x4e, 0x76, 0xa6, 0x6a, 0x52, 0x25, 0x0d, 0x12,
+	0x0a, 0x0d, 0xb3, 0x88, 0x63, 0x34, 0xc6, 0x8d, 0x36, 0x88, 0x96, 0xdb, 0xf0, 0x25, 0x9c, 0xbc,
+	0x45, 0x7b, 0x29, 0x44, 0x11, 0x62, 0x96, 0x24, 0xf4, 0xa1, 0x86, 0x73, 0xc6, 0x45, 0xc1, 0x42,
+	0xbe, 0x09, 0x7f, 0xfb, 0x10, 0x2c, 0x9d, 0x6b, 0x34, 0xbc, 0xa3, 0x68, 0x54, 0xee, 0x81, 0x86,
+	0x5f, 0x82, 0x46, 0xf5, 0x28, 0x1a, 0xb5, 0x43, 0x68, 0xd4, 0x0f, 0xa0, 0xd1, 0x38, 0x8a, 0x46,
+	0x50, 0x86, 0x46, 0xf3, 0x30, 0x1a, 0x70, 0x04, 0x8d, 0x56, 0x39, 0x1a, 0xed, 0x32, 0x34, 0x3a,
+	0xe5, 0x68, 0x74, 0xf7, 0xa1, 0xf1, 0x1e, 0x1e, 0xef, 0xce, 0xb9, 0x60, 0xe3, 0x0d, 0x04, 0xc5,
+	0x68, 0x32, 0x38, 0xfc, 0x71, 0xeb, 0xfc, 0x74, 0xb2, 0xf3, 0x9b, 0x4c, 0x56, 0x41, 0x2b, 0xeb,
+	0xf9, 0xcf, 0x0a, 0x3c, 0x2c, 0xe4, 0xab, 0xdc, 0x75, 0x79, 0xfd, 0x8e, 0x7c, 0x85, 0xce, 0x16,
+	0x81, 0xe4, 0xd9, 0x9d, 0xbb, 0xf6, 0xfd, 0x3b, 0x83, 0xe7, 0x65, 0xb6, 0xbc, 0xd8, 0xf0, 0xf4,
+	0xc7, 0x9f, 0x7f, 0xbf, 0x2a, 0x8f, 0xc2, 0xee, 0xd4, 0xf9, 0xb0, 0x88, 0xba, 0xf0, 0xce, 0xc8,
+	0x77, 0xe8, 0x6e, 0xbf, 0x90, 0xdc, 0xbd, 0x74, 0x2f, 0xea, 0x83, 0x17, 0xa5, 0xbe, 0x22, 0xfb,
+	0xc0, 0x65, 0xef, 0x87, 0xbd, 0xe9, 0x0c, 0x2d, 0x13, 0x62, 0xd9, 0x8c, 0x0b, 0xef, 0xec, 0xa6,
+	0xee, 0x7e, 0xd6, 0xd7, 0xff, 0x03, 0x00, 0x00, 0xff, 0xff, 0x1e, 0x22, 0x39, 0xa9, 0xa8, 0x05,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -435,7 +497,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ProjectCreatorAPIClient interface {
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error)
-	FetchProject(ctx context.Context, in *FetchProjectRequest, opts ...grpc.CallOption) (*FetchProjectResponse, error)
+	GetAllProjects(ctx context.Context, in *GetAllProjectsRequest, opts ...grpc.CallOption) (*GetAllProjectsResponse, error)
 }
 
 type projectCreatorAPIClient struct {
@@ -455,9 +517,9 @@ func (c *projectCreatorAPIClient) CreateProject(ctx context.Context, in *CreateP
 	return out, nil
 }
 
-func (c *projectCreatorAPIClient) FetchProject(ctx context.Context, in *FetchProjectRequest, opts ...grpc.CallOption) (*FetchProjectResponse, error) {
-	out := new(FetchProjectResponse)
-	err := c.cc.Invoke(ctx, "/project_creator.ProjectCreatorAPI/FetchProject", in, out, opts...)
+func (c *projectCreatorAPIClient) GetAllProjects(ctx context.Context, in *GetAllProjectsRequest, opts ...grpc.CallOption) (*GetAllProjectsResponse, error) {
+	out := new(GetAllProjectsResponse)
+	err := c.cc.Invoke(ctx, "/project_creator.ProjectCreatorAPI/GetAllProjects", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -467,7 +529,7 @@ func (c *projectCreatorAPIClient) FetchProject(ctx context.Context, in *FetchPro
 // ProjectCreatorAPIServer is the server API for ProjectCreatorAPI service.
 type ProjectCreatorAPIServer interface {
 	CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error)
-	FetchProject(context.Context, *FetchProjectRequest) (*FetchProjectResponse, error)
+	GetAllProjects(context.Context, *GetAllProjectsRequest) (*GetAllProjectsResponse, error)
 }
 
 func RegisterProjectCreatorAPIServer(s *grpc.Server, srv ProjectCreatorAPIServer) {
@@ -492,20 +554,20 @@ func _ProjectCreatorAPI_CreateProject_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ProjectCreatorAPI_FetchProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FetchProjectRequest)
+func _ProjectCreatorAPI_GetAllProjects_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllProjectsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProjectCreatorAPIServer).FetchProject(ctx, in)
+		return srv.(ProjectCreatorAPIServer).GetAllProjects(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/project_creator.ProjectCreatorAPI/FetchProject",
+		FullMethod: "/project_creator.ProjectCreatorAPI/GetAllProjects",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProjectCreatorAPIServer).FetchProject(ctx, req.(*FetchProjectRequest))
+		return srv.(ProjectCreatorAPIServer).GetAllProjects(ctx, req.(*GetAllProjectsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -519,8 +581,8 @@ var _ProjectCreatorAPI_serviceDesc = grpc.ServiceDesc{
 			Handler:    _ProjectCreatorAPI_CreateProject_Handler,
 		},
 		{
-			MethodName: "FetchProject",
-			Handler:    _ProjectCreatorAPI_FetchProject_Handler,
+			MethodName: "GetAllProjects",
+			Handler:    _ProjectCreatorAPI_GetAllProjects_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
