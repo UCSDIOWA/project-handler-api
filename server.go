@@ -145,14 +145,14 @@ func (s *server) GetAllProjects(ctx context.Context, request *pb.GetAllProjectsR
 	DB = &mongo{m.DB("tea").C("users")}
 	err := DB.Operation.Find(bson.M{"email": request.Email}).One(&userProjects)
 	if err != nil {
-		return nil, err
+		return &pb.GetAllProjectsResponse{Success: false}, nil
 	}
 
 	DB = &mongo{m.DB("tea").C("projects")}
 	iter := DB.Operation.Find(nil).Iter()
 	err = iter.All(&allProjects)
 	if err != nil {
-		return nil, err
+		return &pb.GetAllProjectsResponse{Success: false}, nil
 	}
 
 	invalidProjects := make(map[int]bool)
@@ -185,6 +185,8 @@ func (s *server) GetAllProjects(ctx context.Context, request *pb.GetAllProjectsR
 			response.Projects = append(response.Projects, &newProject)
 		}
 	}
+
+	response.Success = true
 
 	return &response, nil
 }

@@ -64,5 +64,6 @@ message Projects {
 }
 
 message GetAllProjectsResponse {
-    repeated Projects projects = 1;
+    bool success = 1;
+    repeated Projects projects = 2;
 }
