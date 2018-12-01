@@ -118,7 +118,7 @@ func startHTTP() error {
 	log.Println("Listening on port 8080")
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/createproject", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		Set(w, AccessControl{
 			Origin:         "*",
 			AllowedMethods: []string{"POST"},
