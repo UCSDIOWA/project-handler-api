@@ -168,6 +168,7 @@ func (s *server) GetAllProjects(ctx context.Context, request *pb.GetAllProjectsR
 	for i := 0; i < len(allProjects); i++ {
 		if !invalidProjects[i] && !allProjects[i].Done && !allProjects[i].Isprivate {
 			var newProject pb.Projects
+			newProject.Xid = allProjects[i].Xid
 			newProject.Title = allProjects[i].Title
 			newProject.Projectleader = allProjects[i].Projectleader
 			newProject.Percentdone = allProjects[i].Percentdone

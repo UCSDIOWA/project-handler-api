@@ -47,20 +47,21 @@ message GetAllProjectsRequest {
 }
 
 message Projects {
-    string title = 1;
-    string projectleader = 2;
-    int32 percentdone = 3;
-    int32 groupsize = 4;
-    bool isprivate = 5;
-    repeated string tags = 6;
-    string deadline = 7;
-    string calendarid = 8;
-    string description = 9;
-    bool done = 10;
-    repeated string joinrequests = 11;
-    repeated string memberslist = 12;
-    repeated string milestones = 13;
-    repeated string announcements = 14; 
+    string xid = 1;
+    string title = 2;
+    string projectleader = 3;
+    int32 percentdone = 4;
+    int32 groupsize = 5;
+    bool isprivate = 6;
+    repeated string tags = 7;
+    string deadline = 8;
+    string calendarid = 9;
+    string description = 10;
+    bool done = 11;
+    repeated string joinrequests = 12;
+    repeated string memberslist = 13;
+    repeated string milestones = 14;
+    repeated string announcements = 15; 
 }
 
 message GetAllProjectsResponse {
