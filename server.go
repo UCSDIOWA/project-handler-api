@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/rs/cors"
+
 	"github.com/globalsign/mgo/bson"
 
 	pb "github.com/UCSDIOWA/project-handler-api/protos"
@@ -119,23 +121,19 @@ func startHTTP() error {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/.*", func(w http.ResponseWriter, r *http.Request) {
-		Set(w, AccessControl{
-			Origin:         "*",
-			AllowedMethods: []string{"POST"},
-		})
-		Set(w, ContentType("application/json"))
-		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST")
 	})
 	mux.Handle("/", gwmux)
+	handler := cors.Default().Handler(mux)
 
 	herokuPort := os.Getenv("PORT")
 	if herokuPort == "" {
 		herokuPort = "8080"
 	}
 
-	return http.ListenAndServe(":"+herokuPort, mux)
+	return http.ListenAndServe(":"+herokuPort, handler)
 }
 
 /* This function creates a project for a given user */
