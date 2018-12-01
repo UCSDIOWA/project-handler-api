@@ -109,13 +109,23 @@ func startHTTP() error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	mux := runtime.NewServeMux()
+	gwmux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err := pb.RegisterProjectCreatorAPIHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
+	err := pb.RegisterProjectCreatorAPIHandlerFromEndpoint(ctx, gwmux, *echoEndpoint, opts)
 	if err != nil {
 		return err
 	}
 	log.Println("Listening on port 8080")
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		Set(w, AccessControl{
+			Origin:         "*",
+			AllowedMethods: []string{"POST", "HEAD", "OPTIONS"},
+		})
+		Set(w, ContentType("application/json"))
+	})
+	mux.Handle("/", gwmux)
 
 	herokuPort := os.Getenv("PORT")
 	if herokuPort == "" {
