@@ -228,6 +228,9 @@ func (s *server) GetProjects(ctx context.Context, request *pb.GetProjectsRequest
 	}
 
 	response.Success = true
+	if len(response.Projects) == 0 {
+		response.Success = false
+	}
 
 	return &response, nil
 }
