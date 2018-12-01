@@ -18,6 +18,13 @@ service ProjectCreatorAPI {
             body: "*"
         };
     }
+
+    rpc GetProjects (GetProjectsRequest) returns (GetProjectsResponse) {
+        option (google.api.http) = {
+            post: "/getprojects"
+            body: "*"
+        };
+    }
 }
 
 message CreateProjectRequest {
@@ -67,4 +74,13 @@ message Projects {
 message GetAllProjectsResponse {
     bool success = 1;
     repeated Projects projects = 2;
+}
+
+message GetProjectsRequest {
+    repeated string xid = 1;
+}
+
+message GetProjectsResponse {
+    bool success = 1;
+    repeated Projects projects = 2; 
 }

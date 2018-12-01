@@ -191,3 +191,43 @@ func (s *server) GetAllProjects(ctx context.Context, request *pb.GetAllProjectsR
 
 	return &response, nil
 }
+
+func (s *server) GetProjects(ctx context.Context, request *pb.GetProjectsRequest) (*pb.GetProjectsResponse, error) {
+	var allProjects []getAllProjects
+	var response pb.GetProjectsResponse
+
+	DB = &mongo{m.DB("tea").C("projects")}
+	iter := DB.Operation.Find(nil).Iter()
+	err := iter.All(&allProjects)
+	if err != nil {
+		return &pb.GetProjectsResponse{Success: false}, nil
+	}
+
+	for _, currentXid := range request.Xid {
+		for i := 0; i < len(allProjects); i++ {
+			if currentXid == allProjects[i].Xid {
+				var newProject pb.Projects
+				newProject.Xid = allProjects[i].Xid
+				newProject.Title = allProjects[i].Title
+				newProject.Projectleader = allProjects[i].Projectleader
+				newProject.Percentdone = allProjects[i].Percentdone
+				newProject.Groupsize = allProjects[i].Groupsize
+				newProject.Isprivate = allProjects[i].Isprivate
+				newProject.Tags = allProjects[i].Tags
+				newProject.Deadline = allProjects[i].Deadline
+				newProject.Calendarid = allProjects[i].Calendarid
+				newProject.Description = allProjects[i].Description
+				newProject.Done = allProjects[i].Done
+				newProject.Joinrequests = allProjects[i].Joinrequests
+				newProject.Memberslist = allProjects[i].Memberslist
+				newProject.Milestones = allProjects[i].Milestones
+				newProject.Announcements = allProjects[i].Announcements
+				response.Projects = append(response.Projects, &newProject)
+			}
+		}
+	}
+
+	response.Success = true
+
+	return &response, nil
+}

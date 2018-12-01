@@ -54,6 +54,19 @@ func request_ProjectCreatorAPI_GetAllProjects_0(ctx context.Context, marshaler r
 
 }
 
+func request_ProjectCreatorAPI_GetProjects_0(ctx context.Context, marshaler runtime.Marshaler, client ProjectCreatorAPIClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetProjectsRequest
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.GetProjects(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
 // RegisterProjectCreatorAPIHandlerFromEndpoint is same as RegisterProjectCreatorAPIHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterProjectCreatorAPIHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
@@ -150,6 +163,35 @@ func RegisterProjectCreatorAPIHandlerClient(ctx context.Context, mux *runtime.Se
 
 	})
 
+	mux.Handle("POST", pattern_ProjectCreatorAPI_GetProjects_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		if cn, ok := w.(http.CloseNotifier); ok {
+			go func(done <-chan struct{}, closed <-chan bool) {
+				select {
+				case <-done:
+				case <-closed:
+					cancel()
+				}
+			}(ctx.Done(), cn.CloseNotify())
+		}
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ProjectCreatorAPI_GetProjects_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ProjectCreatorAPI_GetProjects_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -157,10 +199,14 @@ var (
 	pattern_ProjectCreatorAPI_CreateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"createproject"}, ""))
 
 	pattern_ProjectCreatorAPI_GetAllProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"getallprojects"}, ""))
+
+	pattern_ProjectCreatorAPI_GetProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"getprojects"}, ""))
 )
 
 var (
 	forward_ProjectCreatorAPI_CreateProject_0 = runtime.ForwardResponseMessage
 
 	forward_ProjectCreatorAPI_GetAllProjects_0 = runtime.ForwardResponseMessage
+
+	forward_ProjectCreatorAPI_GetProjects_0 = runtime.ForwardResponseMessage
 )
