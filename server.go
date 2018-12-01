@@ -124,6 +124,7 @@ func startHTTP() error {
 			AllowedMethods: []string{"POST"},
 		})
 		Set(w, ContentType("application/json"))
+		w.WriteHeader(http.StatusOK)
 	})
 	mux.Handle("/", gwmux)
 
