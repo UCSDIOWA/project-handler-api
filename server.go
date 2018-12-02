@@ -336,7 +336,7 @@ func (s *server) JoinProjects(ctx context.Context, request *pb.JoinProjectReques
 
 	//add the new email to the pending list
 	project.Joinrequests = append(project.Joinrequests, request.Email)
-	find := bson.M{"email": request.Email}
+	find := bson.M{"xid": request.Xid}
 	update := bson.M{"$set": bson.M{"joinrequests": project.Joinrequests}}
 	err = DB.Operation.Update(find, update)
 
