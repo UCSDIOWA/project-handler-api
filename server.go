@@ -174,7 +174,7 @@ func (s *server) CreateProject(ctx context.Context, request *pb.CreateProjectReq
 		return &pb.CreateProjectResponse{Success: false}, nil
 	}
 
-	user.Currentprojects = append(user.Currentprojects, request.Xid)
+	user.Currentprojects = append(user.Currentprojects, project.Xid)
 	find := bson.M{"email": request.Email}
 	update := bson.M{"$set": bson.M{"currentprojects": user.Currentprojects}}
 
