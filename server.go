@@ -30,21 +30,22 @@ type getUserProjects struct {
 }
 
 type getAllProjects struct {
-	Xid           string   `json:"xid" bson:"xid"`
-	Title         string   `json:"title" bson:"title"`
-	Projectleader string   `json:"projectleader" bson:"projectleader"`
-	Percentdone   int32    `json:"percentdone" bson:"percentdone"`
-	Groupsize     int32    `json:"groupsize" bson:"groupsize"`
-	Isprivate     bool     `json:"isprivate" bson:"isprivate"`
-	Tags          []string `json:"tags" bson:"tags"`
-	Deadline      string   `json:"deadline" bson:"deadline"`
-	Calendarid    string   `json:"calendarid" bson:"calendarid"`
-	Description   string   `json:"description" bson:"description"`
-	Done          bool     `json:"done" bson:"done"`
-	Joinrequests  []string `json:"joinrequests" bson:"joinrequests"`
-	Memberslist   []string `json:"memberslist" bson:"memberslist"`
-	Milestones    []string `json:"milestones" bson:"milestones"`
-	Announcements []string `json:"announcements" bson:"announcements"`
+	Xid                   string   `json:"xid" bson:"xid"`
+	Title                 string   `json:"title" bson:"title"`
+	Projectleader         string   `json:"projectleader" bson:"projectleader"`
+	Percentdone           int32    `json:"percentdone" bson:"percentdone"`
+	Groupsize             int32    `json:"groupsize" bson:"groupsize"`
+	Isprivate             bool     `json:"isprivate" bson:"isprivate"`
+	Tags                  []string `json:"tags" bson:"tags"`
+	Deadline              string   `json:"deadline" bson:"deadline"`
+	Calendarid            string   `json:"calendarid" bson:"calendarid"`
+	Description           string   `json:"description" bson:"description"`
+	Done                  bool     `json:"done" bson:"done"`
+	Joinrequests          []string `json:"joinrequests" bson:"joinrequests"`
+	Memberslist           []string `json:"memberslist" bson:"memberslist"`
+	Milestones            []string `json:"milestones" bson:"milestones"`
+	Pinnedannouncements   []string `json:"pinnedannouncements" bson:"pinnedannouncements"`
+	Unpinnedannouncements []string `json:"unpinnedannouncements" bson:"unpinnedannouncements"`
 }
 
 type getUser struct {
@@ -144,8 +145,24 @@ func startHTTP() error {
 /* This function creates a project for a given user */
 func (s *server) CreateProject(ctx context.Context, request *pb.CreateProjectRequest) (*pb.CreateProjectResponse, error) {
 	DB = &mongo{m.DB("tea").C("projects")}
-	request.Xid = bson.NewObjectId().Hex()
-	err := DB.Operation.Insert(request)
+	var project getAllProjects
+	project.Xid = bson.NewObjectId().Hex()
+	project.Title = request.Title
+	project.Projectleader = request.Projectleader
+	project.Percentdone = request.Percentdone
+	project.Groupsize = request.Groupsize
+	project.Isprivate = request.Isprivate
+	project.Tags = request.Tags
+	project.Deadline = request.Deadline
+	project.Calendarid = request.Calendarid
+	project.Description = request.Description
+	project.Done = request.Done
+	project.Joinrequests = request.Joinrequests
+	project.Memberslist = request.Memberslist
+	project.Milestones = request.Milestones
+	project.Pinnedannouncements = request.Pinnedannouncements
+	project.Unpinnedannouncements = request.Unpinnedannouncements
+	err := DB.Operation.Insert(project)
 	if err != nil {
 		return &pb.CreateProjectResponse{Success: false}, nil
 	}
@@ -211,7 +228,8 @@ func (s *server) GetAllProjects(ctx context.Context, request *pb.GetAllProjectsR
 			newProject.Joinrequests = allProjects[i].Joinrequests
 			newProject.Memberslist = allProjects[i].Memberslist
 			newProject.Milestones = allProjects[i].Milestones
-			newProject.Announcements = allProjects[i].Announcements
+			newProject.Pinnedannouncements = allProjects[i].Pinnedannouncements
+			newProject.Unpinnedannouncements = allProjects[i].Unpinnedannouncements
 			response.Projects = append(response.Projects, &newProject)
 		}
 	}
@@ -250,7 +268,8 @@ func (s *server) GetProjects(ctx context.Context, request *pb.GetProjectsRequest
 				newProject.Joinrequests = allProjects[i].Joinrequests
 				newProject.Memberslist = allProjects[i].Memberslist
 				newProject.Milestones = allProjects[i].Milestones
-				newProject.Announcements = allProjects[i].Announcements
+				newProject.Pinnedannouncements = allProjects[i].Pinnedannouncements
+				newProject.Unpinnedannouncements = allProjects[i].Unpinnedannouncements
 				response.Projects = append(response.Projects, &newProject)
 			}
 		}
@@ -270,20 +289,21 @@ func (s *server) UpdateProject(ctx context.Context, request *pb.UpdateProjectsRe
 	DB = &mongo{m.DB("tea").C("projects")}
 	find := bson.M{"xid": request.Xid}
 	update := bson.M{"$set": bson.M{
-		"title":         request.Title,
-		"projectleader": request.Projectleader,
-		"percentdone":   request.Percentdone,
-		"groupsize":     request.Groupsize,
-		"isprivate":     request.Isprivate,
-		"tags":          request.Tags,
-		"deadline":      request.Deadline,
-		"calendarid":    request.Calendarid,
-		"description":   request.Description,
-		"done":          request.Done,
-		"joinrequests":  request.Joinrequests,
-		"memberslist":   request.Memberslist,
-		"milestones":    request.Milestones,
-		"announcements": request.Announcements,
+		"title":                 request.Title,
+		"projectleader":         request.Projectleader,
+		"percentdone":           request.Percentdone,
+		"groupsize":             request.Groupsize,
+		"isprivate":             request.Isprivate,
+		"tags":                  request.Tags,
+		"deadline":              request.Deadline,
+		"calendarid":            request.Calendarid,
+		"description":           request.Description,
+		"done":                  request.Done,
+		"joinrequests":          request.Joinrequests,
+		"memberslist":           request.Memberslist,
+		"milestones":            request.Milestones,
+		"pinnedannouncements":   request.Pinnedannouncements,
+		"unpinnedannouncements": request.Unpinnedannouncements,
 	}}
 
 	err := DB.Operation.Update(find, update)
@@ -306,7 +326,8 @@ func (s *server) UpdateProject(ctx context.Context, request *pb.UpdateProjectsRe
 	response.Joinrequests = request.Joinrequests
 	response.Memberslist = request.Memberslist
 	response.Milestones = request.Milestones
-	response.Announcements = request.Announcements
+	response.Pinnedannouncements = request.Pinnedannouncements
+	response.Unpinnedannouncements = request.Unpinnedannouncements
 
 	return &response, nil
 }

@@ -57,7 +57,8 @@ message CreateProjectRequest {
     repeated string joinrequests = 13;
     repeated string memberslist = 14;
     repeated string milestones = 15;
-    repeated string announcements = 16;
+    repeated string pinnedannouncements = 16;
+    repeated string unpinnedannouncements = 17;
 }
 
 message CreateProjectResponse {
@@ -83,7 +84,8 @@ message Projects {
     repeated string joinrequests = 12;
     repeated string memberslist = 13;
     repeated string milestones = 14;
-    repeated string announcements = 15; 
+    repeated string pinnedannouncements = 15;
+    repeated string unpinnedannouncements = 16;
 }
 
 message GetAllProjectsResponse {
@@ -115,7 +117,8 @@ message UpdateProjectsRequest {
     repeated string joinrequests = 12;
     repeated string memberslist = 13;
     repeated string milestones = 14;
-    repeated string announcements = 15; 
+    repeated string pinnedannouncements = 15;
+    repeated string unpinnedannouncements = 16;
 }
 
 message UpdateProjectsResponse {
@@ -134,7 +137,8 @@ message UpdateProjectsResponse {
     repeated string joinrequests = 13;
     repeated string memberslist = 14;
     repeated string milestones = 15;
-    repeated string announcements = 16; 
+    repeated string pinnedannouncements = 16;
+    repeated string unpinnedannouncements = 17;
 }
 
 message JoinProjectRequest {
