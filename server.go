@@ -47,6 +47,11 @@ type getAllProjects struct {
 	Announcements []string `json:"announcements" bson:"announcements"`
 }
 
+type getUser struct {
+	Email           string   `json:"email" bson:"email"`
+	Currentprojects []string `json:"currentprojects" bson:"currentprojects"`
+}
+
 // Host mongo server. Updating scope of of m
 var (
 	m            *mgo.Session
@@ -144,6 +149,19 @@ func (s *server) CreateProject(ctx context.Context, request *pb.CreateProjectReq
 	if err != nil {
 		return &pb.CreateProjectResponse{Success: false}, nil
 	}
+
+	DB = &mongo{m.DB("tea").C("users")}
+	var user getUser
+	err = DB.Operation.Find(bson.M{"email": request.Email}).One(&user)
+	if err != nil {
+		return &pb.CreateProjectResponse{Success: false}, nil
+	}
+
+	user.Currentprojects = append(user.Currentprojects, request.Xid)
+	find := bson.M{"email": request.Email}
+	update := bson.M{"$set": bson.M{"currentprojects": user.Currentprojects}}
+
+	err = DB.Operation.Update(find, update)
 
 	return &pb.CreateProjectResponse{Success: true}, nil
 }
@@ -291,4 +309,36 @@ func (s *server) UpdateProject(ctx context.Context, request *pb.UpdateProjectsRe
 	response.Announcements = request.Announcements
 
 	return &response, nil
+}
+
+func (s *server) JoinProjects(ctx context.Context, request *pb.JoinProjectRequest) (*pb.JoinProjectResponse, error) {
+	DB = &mongo{m.DB("tea").C("projects")}
+
+	var project pb.Projects
+	err := DB.Operation.Find(bson.M{"xid": request.Xid}).One(&project)
+	if err != nil {
+		return &pb.JoinProjectResponse{Success: false}, nil
+	}
+
+	//make sure the user is not already in the group
+	for _, v := range project.Memberslist {
+		if v == request.Email {
+			return &pb.JoinProjectResponse{Success: false}, nil
+		}
+	}
+
+	//make sure the user is not already pending
+	for _, v := range project.Joinrequests {
+		if v == request.Email {
+			return &pb.JoinProjectResponse{Success: false}, nil
+		}
+	}
+
+	//add the new email to the pending list
+	project.Joinrequests = append(project.Joinrequests, request.Email)
+	find := bson.M{"email": request.Email}
+	update := bson.M{"$set": bson.M{"joinrequests": project.Joinrequests}}
+	err = DB.Operation.Update(find, update)
+
+	return &pb.JoinProjectResponse{Success: true}, nil
 }

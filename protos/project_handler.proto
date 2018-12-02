@@ -32,24 +32,32 @@ service ProjectCreatorAPI {
             body: "*"
         };
     }
+
+    rpc JoinProjects (JoinProjectRequest) returns (JoinProjectResponse) {
+        option (google.api.http) = {
+            post: "/joinprojects"
+            body: "*"
+        };
+    }
 }
 
 message CreateProjectRequest {
-    string xid = 1;
-    string title = 2;
-    string projectleader = 3;
-    int32 percentdone = 4;
-    int32 groupsize = 5;
-    bool isprivate = 6;
-    repeated string tags = 7;
-    string deadline = 8;
-    string calendarid = 9;
-    string description = 10;
-    bool done = 11;
-    repeated string joinrequests = 12;
-    repeated string memberslist = 13;
-    repeated string milestones = 14;
-    repeated string announcements = 15;
+    string email = 1;
+    string xid = 2;
+    string title = 3;
+    string projectleader = 4;
+    int32 percentdone = 5;
+    int32 groupsize = 6;
+    bool isprivate = 7;
+    repeated string tags = 8;
+    string deadline = 9;
+    string calendarid = 10;
+    string description = 11;
+    bool done = 12;
+    repeated string joinrequests = 13;
+    repeated string memberslist = 14;
+    repeated string milestones = 15;
+    repeated string announcements = 16;
 }
 
 message CreateProjectResponse {
@@ -127,4 +135,13 @@ message UpdateProjectsResponse {
     repeated string memberslist = 14;
     repeated string milestones = 15;
     repeated string announcements = 16; 
+}
+
+message JoinProjectRequest {
+    string xid = 1;
+    string email = 2;
+}
+
+message JoinProjectResponse {
+    bool success = 1;
 }
