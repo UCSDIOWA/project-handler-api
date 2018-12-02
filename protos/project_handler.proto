@@ -25,6 +25,13 @@ service ProjectCreatorAPI {
             body: "*"
         };
     }
+
+    rpc UpdateProject (UpdateProjectsRequest) returns (UpdateProjectsResponse) {
+        option (google.api.http) = {
+            post: "/updateproject"
+            body: "*"
+        };
+    }
 }
 
 message CreateProjectRequest {
@@ -83,4 +90,41 @@ message GetProjectsRequest {
 message GetProjectsResponse {
     bool success = 1;
     repeated Projects projects = 2; 
+}
+
+message UpdateProjectsRequest {
+    string xid = 1;
+    string title = 2;
+    string projectleader = 3;
+    int32 percentdone = 4;
+    int32 groupsize = 5;
+    bool isprivate = 6;
+    repeated string tags = 7;
+    string deadline = 8;
+    string calendarid = 9;
+    string description = 10;
+    bool done = 11;
+    repeated string joinrequests = 12;
+    repeated string memberslist = 13;
+    repeated string milestones = 14;
+    repeated string announcements = 15; 
+}
+
+message UpdateProjectsResponse {
+    bool success = 1;
+    string xid = 2;
+    string title = 3;
+    string projectleader = 4;
+    int32 percentdone = 5;
+    int32 groupsize = 6;
+    bool isprivate = 7;
+    repeated string tags = 8;
+    string deadline = 9;
+    string calendarid = 10;
+    string description = 11;
+    bool done = 12;
+    repeated string joinrequests = 13;
+    repeated string memberslist = 14;
+    repeated string milestones = 15;
+    repeated string announcements = 16; 
 }

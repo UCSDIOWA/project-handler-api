@@ -245,3 +245,50 @@ func (s *server) GetProjects(ctx context.Context, request *pb.GetProjectsRequest
 
 	return &response, nil
 }
+
+func (s *server) UpdateProject(ctx context.Context, request *pb.UpdateProjectsRequest) (*pb.UpdateProjectsResponse, error) {
+	var response pb.UpdateProjectsResponse
+
+	DB = &mongo{m.DB("tea").C("projects")}
+	find := bson.M{"xid": request.Xid}
+	update := bson.M{"$set": bson.M{
+		"title":         request.Title,
+		"projectleader": request.Projectleader,
+		"percentdone":   request.Percentdone,
+		"groupsize":     request.Groupsize,
+		"isprivate":     request.Isprivate,
+		"tags":          request.Tags,
+		"deadline":      request.Deadline,
+		"calendarid":    request.Calendarid,
+		"description":   request.Description,
+		"done":          request.Done,
+		"joinrequests":  request.Joinrequests,
+		"memberslist":   request.Memberslist,
+		"milestones":    request.Milestones,
+		"announcements": request.Announcements,
+	}}
+
+	err := DB.Operation.Update(find, update)
+	if err != nil {
+		response.Success = false
+		return &response, nil
+	}
+
+	response.Success = true
+	response.Title = request.Title
+	response.Projectleader = request.Projectleader
+	response.Percentdone = request.Percentdone
+	response.Groupsize = request.Groupsize
+	response.Isprivate = request.Isprivate
+	response.Tags = request.Tags
+	response.Deadline = request.Deadline
+	response.Calendarid = request.Calendarid
+	response.Description = request.Description
+	response.Done = request.Done
+	response.Joinrequests = request.Joinrequests
+	response.Memberslist = request.Memberslist
+	response.Milestones = request.Milestones
+	response.Announcements = request.Announcements
+
+	return &response, nil
+}
