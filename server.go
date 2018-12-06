@@ -158,7 +158,7 @@ func (s *server) CreateProject(ctx context.Context, request *pb.CreateProjectReq
 	project.Description = request.Description
 	project.Done = request.Done
 	project.Joinrequests = request.Joinrequests
-	project.Memberslist = request.Memberslist
+	project.Memberslist = append(project.Memberslist, request.Email)
 	project.Milestones = request.Milestones
 	project.Pinnedannouncements = request.Pinnedannouncements
 	project.Unpinnedannouncements = request.Unpinnedannouncements
